@@ -14,3 +14,9 @@ router.get('/', async () => {
     hello: 'world',
   }
 })
+
+const UserController = () => import('#controllers/users_controller')
+// const UserValidator = () => import('#validators/user')
+
+router.post('user', [UserController, 'store'])
+// router.put('posts/:id', [UsersController, 'update'])
