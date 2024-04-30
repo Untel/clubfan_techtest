@@ -11,25 +11,25 @@ export default class UsersController {
   }: HttpContext) {
     const user = auth.user!
     const target = await User.findOrFail(request.param('target'))
-    await user.related('followers').attach([target.id])
+    await target.related('followers').attach([user.id])
     const saved = await user.save();
     return new UserPresenter(saved).toJSON();
   }
 
   async update ({ request, auth }: HttpContext) {
+    const user = auth.user!;
     const payload = await request.validateUsing(updateUserProfileValidator);
-    const user = await User.findOrFail(auth.user!.id);
     user.merge(payload);
-    const saved = await user.save();
-    return new UserPresenter(saved).toJSON();
+    return new UserPresenter(await user.save()).toJSON();
   }
 
   async show ({ auth }: HttpContext) {
-    const user = await User.findOrFail(auth.user!.id);
-    await Promise.all([
-      user.preload('followers'),
-      user.preload('media'),
-    ]);
+    const user = await User.query()
+      .preload('followers')
+      .preload('following')
+      .preload('media')
+      .where('id', auth.user!.id)
+      .firstOrFail();
     return new UserPresenter(user).toJSON();
   }
 

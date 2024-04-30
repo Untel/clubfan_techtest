@@ -42,6 +42,17 @@ export default class User extends compose(BaseModel, AuthFinder) {
   })
   declare followers: ManyToMany<typeof User>
 
+  @manyToMany(() => User, {
+    pivotTable: 'user_followers',
+    pivotForeignKey: 'follower_id',
+    pivotRelatedForeignKey: 'user_id',
+    pivotTimestamps: {
+      createdAt: 'created_at',
+      updatedAt: false,
+    },
+  })
+  declare following: ManyToMany<typeof User>
+
   @manyToMany(() => Media, {
     pivotTable: 'user_media_impressions',
     pivotForeignKey: 'user_id',

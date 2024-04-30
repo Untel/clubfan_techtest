@@ -12,6 +12,7 @@ export class UserPresenter {
       profilePictureUrl: this.user.profilePictureUrl,
       description: this.user.description,
       followersCount: this.user.$hasRelated('followers') ? this.user.followers?.length : undefined,
+      followingCount: this.user.$hasRelated('following') ? this.user.following?.length : undefined,
       mediaCount: this.user.$hasRelated('media') ? this.user.media?.length : undefined,
       media: this.user.$hasRelated('media') ? this.user.media.map(media => new MediaPresenter(media).toJSON()) : undefined,
     }
