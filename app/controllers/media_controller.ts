@@ -19,8 +19,21 @@ export default class MediaController {
     return new MediaPresenter(media).toJSON();
   }
 
-  async show ({ params }: HttpContext) {
+  async show ({ params, auth, }: HttpContext) {
     const media = await Media.findOrFail(params.id)
+    await media.related('impressions').attach([auth.user!.id])
+    return new MediaPresenter(media).toJSON();
+  }
+
+  async update ({ request, auth, response }: HttpContext) {
+    const user = auth.user!
+    const media = await Media.findOrFail(request.param('id'))
+    if (media.userId !== user.id) {
+      return response.forbidden({ message: 'You can only update your own media' })
+    }
+    const payload = await request.validateUsing(createMediaValidator)
+    media.merge(payload)
+    await media.save()
     return new MediaPresenter(media).toJSON();
   }
 
@@ -41,7 +54,7 @@ export default class MediaController {
       .orderBy('created_at', sort)
       .paginate(page, take);
 
-    user.related('impressions').attach(feed.all().map((m) => m.id));
+    await user.related('impressions').attach(feed.all().map((m) => m.id));
     return feed;
   }
 
