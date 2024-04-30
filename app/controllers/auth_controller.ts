@@ -1,14 +1,15 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import { createUserValidator } from '#validators/user'
+import { UserPresenter } from '#presenters/user';
 
 export default class AuthController {
 
   async whoami({ auth }: HttpContext) {
-    return auth.user;
+    return new UserPresenter(auth.user!).toJSON();
   }
 
-  async signin({ request }: HttpContext) {
+  async signin({ request, response }: HttpContext) {
     const { email, password } = request.only(['email', 'password'])
     const user = await User.verifyCredentials(email, password)
 
@@ -19,7 +20,7 @@ export default class AuthController {
         value: token.value!.release(),
       }
     }
-    return null;
+    return response.forbidden('Invalid credentials');
   }
 
   async signup({ request, response }: HttpContext) {
@@ -28,7 +29,6 @@ export default class AuthController {
     if (payload.password !== payload.repeatPassword) {
       return response.forbidden('Passwords do not match');
     }
-
     const user = await User.create({
       email: payload.email,
       password: payload.password,

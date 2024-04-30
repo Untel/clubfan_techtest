@@ -10,6 +10,11 @@ export default class Media extends BaseModel {
   @column()
   declare url: string
 
+  @column()
+  declare title: string
+
+  @column()
+  declare description: string
 
   @column()
   declare userId: number
