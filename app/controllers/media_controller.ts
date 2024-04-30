@@ -28,4 +28,11 @@ export default class MediaController {
       .orderBy('created_at', 'desc')
       .limit(10);
   }
+
+  async see({ auth, request }: HttpContext) {
+    const user = auth.user!
+    const media = await Media.findOrFail(request.param('id'))
+    await media.related('impressions').attach([user.id])
+    return media;
+  }
 }

@@ -25,8 +25,9 @@ router.group(() => {
   router.get('profile', [ProfilesController, 'show'])
   router.delete('profile', [ProfilesController, 'delete'])
   router.post('media', [MediaController, 'store'])
+  router.post('media/:id/see', [MediaController, 'see'])
   router.get('user/follow/:target', [UsersController, 'follow'])
-
+  router.get('feed', [MediaController, 'feed'])
 }).middleware(middleware.auth())
 
 // router.put('posts/:id', [UsersController, 'update'])

@@ -15,6 +15,10 @@ export default class ProfilesController {
 
   async show ({ auth, params }: HttpContext) {
     const user = await User.findOrFail(auth.user!.id);
+    await Promise.all([
+      user.preload('followers'),
+      user.preload('media'),
+    ]);
     return user;
   }
 
