@@ -2,19 +2,42 @@ import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
 import { createUserValidator } from '#validators/user'
 
-export default class UserController {
-  async index({}: HttpContext) {
-    // return list of posts
+export default class AuthController {
+
+  async whoami({ auth }: HttpContext) {
+    return auth.user;
   }
 
-  async store({ request }: HttpContext) {
-    const data = request.all()
-    const payload = await createUserValidator.validate(data);
-    const user = User.create(payload);
-    return user;
+  async signin({ request }: HttpContext) {
+    const { email, password } = request.only(['email', 'password'])
+    const user = await User.verifyCredentials(email, password)
+
+    if (user) {
+      const token = await User.accessTokens.create(user)
+      return {
+        type: 'bearer',
+        value: token.value!.release(),
+      }
+    }
+    return null;
   }
 
-  async show({}: HttpContext) {
-    // return post by id
+  async signup({ request, response }: HttpContext) {
+    const payload = await request.validateUsing(createUserValidator);
+
+    if (payload.password !== payload.repeatPassword) {
+      return response.forbidden('Passwords do not match');
+    }
+
+    const user = await User.create({
+      email: payload.email,
+      password: payload.password,
+      username: payload.username,
+    });
+    const token = await User.accessTokens.create(user)
+    return {
+      type: 'bearer',
+      value: token.value!.release(),
+    };
   }
 }

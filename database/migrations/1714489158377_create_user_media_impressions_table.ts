@@ -7,8 +7,8 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
 
-      table.foreign('user_id').references('users.id').onDelete('CASCADE')
-      table.foreign('media_id').references('media.id').onDelete('CASCADE')
+      table.integer('user_id').references('users.id').onDelete('CASCADE')
+      table.integer('media_id').references('media.id').onDelete('CASCADE')
 
       table.timestamp('created_at')
       table.timestamp('updated_at')
