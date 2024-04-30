@@ -35,7 +35,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
     pivotForeignKey: 'user_id',
     pivotRelatedForeignKey: 'follower_id',
     pivotTimestamps: {
-      createdAt: 'creation_at',
+      createdAt: 'created_at',
       updatedAt: false,
     },
   })

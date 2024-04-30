@@ -6,12 +6,21 @@ import { HttpContext } from "@adonisjs/core/http";
 
 export default class ProfilesController {
   async update ({ request, auth, response }: HttpContext) {
-    if (!auth.user) {
-      return response.forbidden('You must be logged in to update your profile');
-    }
-    const payload = request.validateUsing(updateUserProfileValidator);
-    const user = await User.findOrFail(auth.user.id);
+    const payload = await request.validateUsing(updateUserProfileValidator);
+    const user = await User.findOrFail(auth.user!.id);
+    console.log('payload', payload);
     user.merge(payload);
     return user.save();
+  }
+
+  async show ({ auth, params }: HttpContext) {
+    const user = await User.findOrFail(auth.user!.id);
+    return user;
+  }
+
+  async delete ({ auth, response }: HttpContext) {
+    const user = await User.findOrFail(auth.user!.id);
+    await user.delete();
+    return response.status(204);
   }
 }

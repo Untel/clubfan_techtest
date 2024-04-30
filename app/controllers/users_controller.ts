@@ -9,4 +9,15 @@ export default class UsersController {
   }: HttpContext) {
     return User.find(request.param('id'))
   }
+
+  async follow({
+    auth,
+    request,
+  }: HttpContext) {
+    const user = auth.user!
+    const target = await User.findOrFail(request.param('target'))
+    await user.related('followers').attach([target.id])
+    const saved = await user.save();
+    return saved;
+  }
 }
