@@ -42,6 +42,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   })
   declare followers: ManyToMany<typeof User>
 
+
   @hasMany(() => Media)
   declare media: HasMany<typeof Media>
 

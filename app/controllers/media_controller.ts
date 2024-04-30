@@ -22,9 +22,16 @@ export default class MediaController {
 
   async feed ({ auth }: HttpContext) {
     const user = auth.user!
+    await user.preload('followers');
     return Media.query()
       .whereNot('user_id', user.id)
-      .whereIn('user_id', user.followers.map(f => f.id))
+      .whereIn('user_id', user.followers.map((u) => u.id))
+      .whereNotExists((query) => {
+        query
+          .from('user_media_impressions')
+          .where('user_id', user.id)
+          .whereRaw('media_id = media.id')
+      })
       .orderBy('created_at', 'desc')
       .limit(10);
   }
@@ -32,6 +39,7 @@ export default class MediaController {
   async see({ auth, request }: HttpContext) {
     const user = auth.user!
     const media = await Media.findOrFail(request.param('id'))
+    console.log("Media is", media.id);
     await media.related('impressions').attach([user.id])
     return media;
   }

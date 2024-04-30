@@ -19,8 +19,8 @@ export default class Media extends BaseModel {
 
   @manyToMany(() => User, {
     pivotTable: 'user_media_impressions',
-    pivotForeignKey: 'user_id',
-    pivotRelatedForeignKey: 'media_id',
+    pivotForeignKey: 'media_id',
+    pivotRelatedForeignKey: 'user_id',
     pivotTimestamps: true,
   })
   declare impressions: ManyToMany<typeof User>
